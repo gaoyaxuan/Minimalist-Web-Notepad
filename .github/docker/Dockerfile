@@ -6,7 +6,7 @@ RUN cd web  \
     && npm install \
     && npm run build:prod  \
     && cd ../server \
-    && npm install
+    && npm install --production
 
 
 
