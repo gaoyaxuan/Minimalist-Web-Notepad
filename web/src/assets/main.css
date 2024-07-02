@@ -1,0 +1,62 @@
+/** {*/
+/*    margin:0;*/
+/*    padding:0;*/
+/*}*/
+/*html,body{*/
+/*    height:100%;*/
+/*}*/
+/*#app{*/
+/*    height:100%;*/
+/*}*/
+
+/*.editor-container{*/
+/*    height: 99vh;*/
+/*}*/
+
+
+#app {
+    width: 100vw;  /* 宽度铺满视口宽度 */
+    height: 100vh; /* 高度铺满视口高度 */
+    position: fixed; /* 定位，使其位于屏幕上方 */
+    top: 0;
+    left: 0;
+}
+
+.container {
+    width: 100vw;  /* 宽度铺满视口宽度 */
+    height: 100vh; /* 高度铺满视口高度 */
+    position: fixed; /* 定位，使其位于屏幕上方 */
+    top: 0;
+    left: 0;
+}
+
+.tool {
+    width: 100vw;  /* 宽度铺满视口宽度 */
+    height: 50px; /* 高度铺满视口高度 */
+    position: fixed; /* 定位，使其位于屏幕上方 */
+    top: 0;
+    left: 0;
+}
+
+.my-button {
+    background-color: #4CAF50; /* Green background */
+    border: none; /* Remove borders */
+    color: white; /* White text */
+    padding: 5px 5px; /* Some padding */
+    text-align: center; /* Centered text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Get it to display like an inline element */
+    font-size: 12px; /* Increase font size */
+    margin: 13px 5px 13px  5px; /* Some margin */
+    cursor: pointer; /* Pointer/hand icon */
+    border-radius: 10px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+.my-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.my-button:active {
+    background-color: #3e8e41; /* Even darker green on click */
+}

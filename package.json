@@ -1,0 +1,14 @@
+{
+  "name": "minimalist-web-notepad",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:web": "cd web && npm install && npm run build:prod",
+    "dev:web": "cd web && npm run dev",
+    "dev:server": "cd server && node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
