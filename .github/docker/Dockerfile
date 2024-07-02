@@ -1,4 +1,4 @@
-FROM node:20-alpine3.18 AS builder
+FROM node:20.15-alpine3.19 AS builder
 WORKDIR /app
 
 ADD ../.. .
@@ -10,7 +10,7 @@ RUN cd web  \
 
 
 
-FROM node:20-alpine3.18 as runner
+FROM node:20.15-alpine3.19 as runner
 WORKDIR /app
 
 COPY --from=builder /app/server/*   /app/server/
