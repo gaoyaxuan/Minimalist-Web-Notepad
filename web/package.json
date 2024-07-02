@@ -1,0 +1,30 @@
+{
+  "name": "minimalist-web-notepad-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host ",
+    "build:prod": "vite build",
+    "build:stage": "vite build --mode staging"
+  },
+  "dependencies": {
+    "@vueup/vue-quill": "1.2.0",
+    "quill-cursors": "^4.0.3",
+    "vue": "^3.4.29",
+    "vue-router": "^4.3.3",
+    "y-quill": "^1.0.0",
+    "y-websocket": "^2.0.3",
+    "yjs": "^13.6.18"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.8.0",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "@vitejs/plugin-vue-jsx": "^4.0.0",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.23.0",
+    "prettier": "^3.2.5",
+    "vite": "^5.3.1"
+  }
+}
