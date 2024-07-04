@@ -1,0 +1,101 @@
+diff --git a/node_modules/y-websocket/bin/utils.cjs b/node_modules/y-websocket/bin/utils.cjs
+index 61abc58..619e923 100644
+--- a/node_modules/y-websocket/bin/utils.cjs
++++ b/node_modules/y-websocket/bin/utils.cjs
+@@ -42,7 +42,8 @@ if (typeof persistenceDir === 'string') {
+         ldb.storeUpdate(docName, update)
+       })
+     },
+-    writeState: async (_docName, _ydoc) => {}
++    writeState: async (_docName, _ydoc) => {
++    }
+   }
+ }
+ 
+@@ -56,8 +57,8 @@ exports.setPersistence = persistence_ => {
+ 
+ /**
+  * @return {null|{bindState: function(string,WSSharedDoc):void,
+-  * writeState:function(string,WSSharedDoc):Promise<any>}|null} used persistence layer
+-  */
++ * writeState:function(string,WSSharedDoc):Promise<any>}|null} used persistence layer
++ */
+ exports.getPersistence = () => persistence
+ 
+ /**
+@@ -104,7 +105,7 @@ class WSSharedDoc extends Y.Doc {
+   /**
+    * @param {string} name
+    */
+-  constructor (name) {
++  constructor(name) {
+     super({ gc: gcEnabled })
+     this.name = name
+     /**
+@@ -126,8 +127,12 @@ class WSSharedDoc extends Y.Doc {
+       if (conn !== null) {
+         const connControlledIDs = /** @type {Set<number>} */ (this.conns.get(conn))
+         if (connControlledIDs !== undefined) {
+-          added.forEach(clientID => { connControlledIDs.add(clientID) })
+-          removed.forEach(clientID => { connControlledIDs.delete(clientID) })
++          added.forEach(clientID => {
++            connControlledIDs.add(clientID)
++          })
++          removed.forEach(clientID => {
++            connControlledIDs.delete(clientID)
++          })
+         }
+       }
+       // broadcast awareness update
+@@ -212,20 +217,22 @@ const messageListener = (conn, doc, message) => {
+  * @param {any} conn
+  */
+ const closeConn = (doc, conn) => {
++  const PERSISTENCE = process.env.PERSISTENCE === 'true' ? true : false
+   if (doc.conns.has(conn)) {
+-    /**
+-     * @type {Set<number>}
+-     */
+-    // @ts-ignore
+     const controlledIds = doc.conns.get(conn)
+     doc.conns.delete(conn)
+     awarenessProtocol.removeAwarenessStates(doc.awareness, Array.from(controlledIds), null)
+-    if (doc.conns.size === 0 && persistence !== null) {
+-      // if persisted, we store state and destroy ydocument
+-      persistence.writeState(doc.name, doc).then(() => {
++    if (doc.conns.size === 0) {
++      if (persistence !== null) {
++        // if persisted, we store state and destroy ydocument
++        persistence.writeState(doc.name, doc).then(() => {
++          doc.destroy()
++        })
++        docs.delete(doc.name)
++      } else if (!(PERSISTENCE || false)) {
+         doc.destroy()
+-      })
+-      docs.delete(doc.name)
++        docs.delete(doc.name)
++      }
+     }
+   }
+   conn.close()
+@@ -241,7 +248,9 @@ const send = (doc, conn, m) => {
+     closeConn(doc, conn)
+   }
+   try {
+-    conn.send(m, {}, err => { err != null && closeConn(doc, conn) })
++    conn.send(m, {}, err => {
++      err != null && closeConn(doc, conn)
++    })
+   } catch (e) {
+     closeConn(doc, conn)
+   }
+@@ -260,7 +269,7 @@ exports.setupWSConnection = (conn, req, { docName = (req.url || '').slice(1).spl
+   const doc = getYDoc(docName, gc)
+   doc.conns.set(conn, new Set())
+   // listen and reply to events
+-  conn.on('message', /** @param {ArrayBuffer} message */ message => messageListener(conn, doc, new Uint8Array(message)))
++  conn.on('message', /** @param {ArrayBuffer} message */message => messageListener(conn, doc, new Uint8Array(message)))
+ 
+   // Check if connection is still alive
+   let pongReceived = true

@@ -4,6 +4,8 @@ services:
     container_name: minimalist-web-notepad
     restart: always
     network_mode: bridge
+    environment:
+    - PERSISTENCE=false
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
