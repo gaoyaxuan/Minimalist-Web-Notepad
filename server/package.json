@@ -12,8 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "node-static": "^0.7.11",
-    "patch-package": "^8.0.0",
     "ws": "^8.17.1",
     "y-websocket": "^2.0.3"
+  },
+  "devDependencies": {
+    "patch-package": "^8.0.0"
   }
 }
