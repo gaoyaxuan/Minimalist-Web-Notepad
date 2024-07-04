@@ -1,137 +1,140 @@
 <script setup>
-import "@vueup/vue-quill/dist/vue-quill.snow.css";
-import {ref, computed, watch, onBeforeUnmount} from 'vue'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import { ref, computed, watch } from 'vue'
 import QuillCursors from 'quill-cursors'
 import * as Y from 'yjs'
-import {WebsocketProvider} from 'y-websocket'
-import {QuillBinding} from 'y-quill'
-import {QuillEditor} from '@vueup/vue-quill';
-import {useRoute} from 'vue-router';
-import randomName from "@/utils/random-name.js";
+import { WebsocketProvider } from 'y-websocket'
+import { QuillBinding } from 'y-quill'
+import { QuillEditor } from '@vueup/vue-quill'
+import { useRoute } from 'vue-router'
+import randomName from '@/utils/random-name.js'
 
-const content = ref("");
-const onlineUser = ref(1);
-const defaultTile = document.title;
+const content = ref('')
+const onlineUser = ref(1)
+const defaultTile = document.title
 const props = defineProps({
   /* 编辑器的内容 */
   modelValue: {
-    type: String,
+    type: String
   },
   /* 高度 */
   height: {
     type: Number,
-    default: null,
+    default: null
   },
   /* 最小高度 */
   minHeight: {
     type: Number,
-    default: null,
+    default: null
   },
   /* 只读 */
   readOnly: {
     type: Boolean,
-    default: false,
+    default: false
   }
-});
+})
 
 const modules = ref({
   name: 'cursors',
   module: QuillCursors,
   options: {
-    hideDelayMs: 2000,
-  },
+    hideDelayMs: 2000
+  }
 })
 
 const styles = computed(() => {
-  let style = {};
+  let style = {}
   if (props.minHeight) {
-    style.minHeight = `${props.minHeight}px`;
+    style.minHeight = `${props.minHeight}px`
   }
   if (props.height) {
-    style.height = `${props.height}px`;
+    style.height = `${props.height}px`
   }
 
-  return style;
-});
+  return style
+})
 
 watch(() => props.modelValue, (v) => {
   if (v !== content.value) {
-    content.value = v === undefined ? "<p></p>" : v;
+    content.value = v === undefined ? '<p></p>' : v
   }
-}, {immediate: true});
+}, { immediate: true })
 
 
 // 工具栏配置
 const toolbar = ref([
-  ["bold", "italic", "underline", "strike"],      // 加粗 斜体 下划线 删除线
-  ["blockquote", "code-block"],                   // 引用  代码块
-  [{list: "ordered"}, {list: "bullet"}],      // 有序、无序列表
-  [{indent: "-1"}, {indent: "+1"}],           // 缩进
-  [{size: ["small", false, "large", "huge"]}],  // 字体大小
-  [{header: [1, 2, 3, 4, 5, 6, false]}],        // 标题
-  [{color: []}, {background: []}],            // 字体颜色、字体背景颜色
-  [{align: []}],                                // 对齐方式
-  ["clean"],                                      // 清除文本格式
-  ["link", "image",]                      // 链接、图片、视频
+  ['bold', 'italic', 'underline', 'strike'],      // 加粗 斜体 下划线 删除线
+  ['blockquote', 'code-block'],                   // 引用  代码块
+  [{ list: 'ordered' }, { list: 'bullet' }],      // 有序、无序列表
+  [{ indent: '-1' }, { indent: '+1' }],           // 缩进
+  [{ size: ['small', false, 'large', 'huge'] }],  // 字体大小
+  [{ header: [1, 2, 3, 4, 5, 6, false] }],        // 标题
+  [{ color: [] }, { background: [] }],            // 字体颜色、字体背景颜色
+  [{ align: [] }],                                // 对齐方式
+  ['clean'],                                      // 清除文本格式
+  ['link', 'image']                      // 链接、图片、视频
 ])
 
 const options = ref({
-  theme: "snow",
+  theme: 'snow',
   bounds: document.body,
-  debug: "warn",
+  debug: 'warn',
   modules: {},
-  placeholder: "请输入内容",
-  readOnly: props.readOnly,
-});
+  placeholder: '请输入内容',
+  readOnly: props.readOnly
+})
+
+
+const ydoc = new Y.Doc()
+const route = useRoute()
+const randomPath = route.params.randomPath
+const nickName = randomName.getNickName()
+let wsURL
+if (import.meta.env.MODE === 'production') {
+  console.log('当前环境是prod')
+  if (window.location.protocol === 'http:') {
+    console.log('当前是HTTP')
+    wsURL = 'ws://' + window.location.host
+  } else if (window.location.protocol === 'https:') {
+    console.log('当前是HTTPS')
+    wsURL = 'wss://' + window.location.host
+  }
+} else {
+  console.log('当前环境是是dev')
+  wsURL = 'ws://127.0.0.1:3000'
+}
+console.log('当前ws地址:' + wsURL)
+const provider = new WebsocketProvider(
+  wsURL,
+  randomPath,
+  ydoc
+)
+const ytext = ydoc.getText('quill')
+
+provider.awareness.setLocalStateField('user', {
+  name: nickName,
+  color: 'red'
+})
+
+provider.awareness.on('change', () => {
+  const states = provider.awareness.getStates()
+  if (states) {
+    onlineUser.value = states.size
+  }
+})
+
+watch(onlineUser, () => {
+  document.title = defaultTile + '-  ' + onlineUser.value + ' 在线'
+
+}, { immediate: true })
 
 function editorReady(quill) {
-  const ydoc = new Y.Doc()
-  const route = useRoute();
-  const randomPath = route.params.randomPath;
-  const nickName = randomName.getNickName();
-  let wsURL;
-  if (import.meta.env.MODE === 'production') {
-    console.log("当前环境是prod")
-    if (window.location.protocol === "http:") {
-      console.log("当前是HTTP");
-      wsURL = "ws://" + window.location.host
-    } else if (window.location.protocol === "https:") {
-      console.log("当前是HTTPS");
-      wsURL = "wss://" + window.location.host
-    }
-  } else {
-    console.log("当前环境是是dev")
-    wsURL = "ws://10.0.0.7:8874"
-  }
-  console.log("当前ws地址:" + wsURL)
-  const provider = new WebsocketProvider(
-      wsURL, // use the public ws server
-      // `ws${location.protocol.slice(4)}//${location.host}/ws`, // alternatively: use the local ws server (run `npm start` in root directory)
-      randomPath,
-      ydoc
-  )
-  const ytext = ydoc.getText('quill')
   new QuillBinding(ytext, quill, provider.awareness)
-
-  provider.awareness.setLocalStateField('user', {
-    name: nickName,
-    color: 'red'
-  })
-
-  provider.awareness.on('change', () => {
-    const states = provider.awareness.getStates();
-    if (states) {
-      onlineUser.value = states.size
-    }
-  });
-
-  watch(onlineUser, () => {
-    document.title = defaultTile + "-  " + onlineUser.value + " 在线"
-
-  }, {immediate: true})
-
 }
 
+// onBeforeUnmount(() => {
+//   provider.disconnect()
+// })
 </script>
 
 <template>
@@ -141,15 +144,15 @@ function editorReady(quill) {
   <div class="container">
 
     <quill-editor
-        ref="quillEditorRef"
-        v-model:content="content"
-        contentType="html"
-        @textChange="(e) => $emit('update:modelValue', content)"
-        @ready="editorReady"
-        :style="styles"
-        :options="options"
-        :modules="modules"
-        :toolbar="toolbar"
+      ref="quillEditorRef"
+      v-model:content="content"
+      contentType="html"
+      @textChange="(e) => $emit('update:modelValue', content)"
+      @ready="editorReady"
+      :style="styles"
+      :options="options"
+      :modules="modules"
+      :toolbar="toolbar"
     >
     </quill-editor>
   </div>
