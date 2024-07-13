@@ -15,7 +15,8 @@ WORKDIR /app
 
 COPY --from=builder /app/server   /app
 COPY --from=builder /app/web/dist  /app/dist
-RUN set -ex \
+RUN apk --no-cache --no-progress add tzdata \
+    && set -ex \
     && chmod -R 544 /app
 
 EXPOSE 3000
