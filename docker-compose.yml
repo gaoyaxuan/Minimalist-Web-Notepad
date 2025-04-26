@@ -2,7 +2,7 @@ services:
   Minimalist-Web-Notepad:
     image: ghcr.io/gaoyaxuan/minimalist-web-notepad:latest
     container_name: minimalist-web-notepad
-    restart: always
+    restart: unless-stopped
     network_mode: bridge
     environment:
     - "PERSISTENCE=false"

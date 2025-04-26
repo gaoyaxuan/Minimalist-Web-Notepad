@@ -3,9 +3,8 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 ADD .  .
-ADD ../.. .
 
-RUN apk --no-cache --no-progress add wget && sh /app/gosu.sh
+RUN apk --no-cache --no-progress add wget && sh /app/.github/docker/gosu.sh
 RUN cd web  \
     && npm install \
     && npm run build:prod  \
@@ -15,13 +14,14 @@ RUN cd web  \
 
 
 FROM node:22-alpine as runner
+
 WORKDIR /app
 
 COPY --from=builder /app/server   /app
 COPY --from=builder /app/web/dist  /app/dist
 COPY --from=builder /usr/sbin/gosu /usr/sbin/
-COPY build.sh  .
-COPY start.sh  .
+COPY --from=builder /app/.github/docker/build.sh  /app
+COPY --from=builder /app/.github/docker/start.sh  /app
 
 RUN apk --no-cache --no-progress add tzdata  shadow \
     && set -ex \
