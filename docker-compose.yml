@@ -5,9 +5,9 @@ services:
     restart: always
     network_mode: bridge
     environment:
-    - PERSISTENCE=false
-    volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+    - "PERSISTENCE=false"
+    - "PUID=1001"
+    - "PGID=1001"
+    - "TZ=Asia/Shanghai"
     ports:
       - "8080:3000"

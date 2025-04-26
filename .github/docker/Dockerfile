@@ -1,7 +1,11 @@
-FROM node:20.15-alpine3.19 AS builder
+FROM node:22-alpine AS builder
+
 WORKDIR /app
 
+ADD .  .
 ADD ../.. .
+
+RUN apk --no-cache --no-progress add wget && sh /app/gosu.sh
 RUN cd web  \
     && npm install \
     && npm run build:prod  \
@@ -10,15 +14,21 @@ RUN cd web  \
 
 
 
-FROM node:20.15-alpine3.19 as runner
+FROM node:22-alpine as runner
 WORKDIR /app
 
 COPY --from=builder /app/server   /app
 COPY --from=builder /app/web/dist  /app/dist
-RUN apk --no-cache --no-progress add tzdata \
+COPY --from=builder /usr/sbin/gosu /usr/sbin/
+COPY build.sh  .
+COPY start.sh  .
+
+RUN apk --no-cache --no-progress add tzdata  shadow \
     && set -ex \
-    && chmod -R 544 /app
+    && sh build.sh \
+    && rm build.sh
 
 EXPOSE 3000
 ENV TZ=Asia/Shanghai
-CMD [ "node" ,"/app/server.js" ]
+
+ENTRYPOINT ["/app/start.sh"]
