@@ -160,21 +160,23 @@ function editorReady(quill) {
 
 
 <style>
-.ql-container {
-  overflow: visible !important;
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/*
-.ql-cursors {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  overflow: hidden;
-  z-index: -1;
+.ql-container {
+  overflow-y: auto !important;  /* 改为允许垂直滚动 */
+  overflow-x: hidden !important;
+  flex: 1;
 }
-*/
+
+.ql-editor {
+  min-height: 100%;
+  padding-bottom: 50px; /* 添加底部内边距,防止内容被遮挡 */
+}
 
 .ql-snow .ql-tooltip[data-mode="link"]::before {
   content: "请输入链接地址:";
