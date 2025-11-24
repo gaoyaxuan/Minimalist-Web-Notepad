@@ -9,7 +9,9 @@ RUN cd web  \
     && npm install \
     && npm run build:prod  \
     && cd ../server \
-    && npm install --production
+    && npm ci --production \
+    && npm prune --production \
+    && npm cache clean --force
 
 
 
@@ -26,9 +28,11 @@ COPY --from=builder /app/.github/docker/start.sh  /app/
 RUN apk --no-cache --no-progress add tzdata  shadow \
     && set -ex \
     && sh build.sh \
-    && rm build.sh
+    && rm build.sh \
+    && rm -rf /tmp/* /var/cache/apk/*
 
 EXPOSE 3000
-ENV TZ=Asia/Shanghai
+ENV TZ=Asia/Shanghai \
+    NODE_ENV=production
 
 ENTRYPOINT ["/app/start.sh"]
